@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ESP32 Servidor HTTP — Explicación paso a paso</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/night.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css" />
+
+  <style>
+    :root {
+      --bg:      #0d1117;
+      --bg2:     #161b22;
+      --bg3:     #21262d;
+      --azul:    #58a6ff;
+      --verde:   #3fb950;
+      --morado:  #bc8cff;
+      --amber:   #d29922;
+      --rojo:    #ff7b72;
+      --gris:    #8b949e;
+      --border:  #30363d;
+      --text:    #e6edf3;
+      --naranja: #d29922;
+    }
+
+    .reveal { font-family: 'Inter', system-ui, sans-serif; color: var(--text); background: var(--bg); }
+    .reveal .slides { background: transparent; }
+    .reveal .progress { height: 3px; }
+    .reveal .progress span { background: var(--azul); box-shadow: 0 0 8px var(--azul); }
+
+    .reveal h1 { font-size: 1.8em; font-weight: 700; letter-spacing: -0.02em; }
+    .reveal h2 { font-size: 1.25em; font-weight: 600; letter-spacing: -0.01em; }
+    .reveal h3 { font-size: 1em; color: var(--azul); font-weight: 600; }
+    .reveal p, .reveal li { font-size: 0.82em; line-height: 1.6; }
+    .reveal ul { margin-left: 1.2em; }
+    .reveal code {
+      font-family: 'JetBrains Mono', monospace !important;
+      font-size: 0.82em !important;
+      background: var(--bg3);
+      padding: 0.1em 0.35em;
+      border-radius: 4px;
+      color: var(--azul);
+    }
+    .reveal pre {
+      border-radius: 10px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.6), 0 0 0 1px var(--border);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .reveal pre code { font-size: 0.76em !important; background: transparent; padding: 0; color: inherit; }
+
+    .card {
+      background: rgba(22, 27, 34, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.65em 1em;
+      margin: 0.3em 0;
+    }
+    .card.azul   { border-left: 3px solid var(--azul);   box-shadow: 0 0 20px rgba(88,166,255,.1); }
+    .card.verde  { border-left: 3px solid var(--verde);  box-shadow: 0 0 20px rgba(63,185,80,.1); }
+    .card.naranja{ border-left: 3px solid var(--amber);  box-shadow: 0 0 20px rgba(210,153,34,.1); }
+    .card.morado { border-left: 3px solid var(--morado); box-shadow: 0 0 20px rgba(188,140,255,.1); }
+    .card.rojo   { border-left: 3px solid var(--rojo);   box-shadow: 0 0 20px rgba(255,123,114,.1); }
+
+    .cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1em; }
+    .cols3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8em; }
+
+    .badge {
+      display: inline-block;
+      background: rgba(88,166,255,.15);
+      border: 1px solid rgba(88,166,255,.4);
+      border-radius: 20px;
+      padding: 0.12em 0.65em;
+      font-size: 0.72em;
+      margin: 0.1em;
+      color: var(--azul);
+      font-weight: 500;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .badge.verde  { background: rgba(63,185,80,.15);  border-color: rgba(63,185,80,.4);  color: var(--verde); }
+    .badge.naranja{ background: rgba(210,153,34,.15); border-color: rgba(210,153,34,.4); color: var(--amber); }
+    .badge.morado { background: rgba(188,140,255,.15);border-color: rgba(188,140,255,.4);color: var(--morado); }
+
+    .highlight { color: var(--azul);   font-weight: 700; }
+    .hl-verde  { color: var(--verde);  font-weight: 700; }
+    .hl-naranja{ color: var(--amber);  font-weight: 700; }
+    .hl-morado { color: var(--morado); font-weight: 700; }
+    .hl-rojo   { color: var(--rojo);   font-weight: 700; }
+
+    .paso { display: flex; align-items: flex-start; gap: 0.6em; margin: 0.4em 0; }
+    .paso-num {
+      background: var(--azul); color: #000;
+      border-radius: 50%; width: 1.5em; height: 1.5em;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.8em; flex-shrink: 0; margin-top: 0.1em;
+    }
+    .paso-num.verde  { background: var(--verde); }
+    .paso-num.naranja{ background: var(--amber); }
+
+    .terminal {
+      background: #010409;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.8em 1em;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68em;
+      text-align: left;
+      line-height: 1.7;
+      position: relative;
+    }
+    .terminal::before { content: '● ● ●'; display: block; color: #ff7b72; font-size: 0.75em; margin-bottom: 0.5em; letter-spacing: 0.2em; }
+    .terminal .prompt { color: var(--azul); }
+    .terminal .output { color: #7ee787; }
+    .terminal .comment { color: var(--gris); font-style: italic; }
+
+    .portada-sub { font-size: 0.55em; color: var(--gris); margin-top: 0.5em; }
+    .glow-azul  { text-shadow: 0 0 20px rgba(88,166,255,.6); }
+    .glow-verde { text-shadow: 0 0 20px rgba(63,185,80,.6); }
+
+    .seccion-titulo {
+      background: linear-gradient(135deg, #0d1b4b 0%, #0a1628 100%);
+      border-left: 5px solid var(--azul);
+      padding: 0.4em 0.8em !important;
+      border-radius: 0 10px 10px 0;
+      box-shadow: 0 0 30px rgba(88,166,255,.15);
+    }
+    .seccion-titulo.verde  { background: linear-gradient(135deg, #0a2e1a, #071f12); border-color: var(--verde); }
+    .seccion-titulo.naranja{ background: linear-gradient(135deg, #2a1800, #1a0e00); border-color: var(--amber); }
+
+    .reveal section.dense { font-size: 0.78em; }
+    .reveal section.dense h2 { font-size: 1.15em; margin-bottom: 0.3em; }
+    .reveal section.dense .card { padding: 0.35em 0.7em; margin: 0.15em 0; }
+
+    .flujo {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.4em; flex-wrap: wrap; margin: 0.6em 0;
+    }
+    .flujo-box {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.4em 0.8em;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.72em;
+      text-align: center;
+    }
+    .flujo-arrow { color: var(--azul); font-size: 1.2em; font-weight: 700; }
+
+    .num-grande {
+      font-size: 3em; font-weight: 700;
+      color: var(--azul); line-height: 1;
+    }
+  </style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SLIDE 1 — PORTADA
+══════════════════════════════════════════════════════════════════ -->
+<section>
+  <div style="margin-bottom:0.6em; font-size:3em;">📡</div>
+  <h1 class="glow-azul">ESP32 Servidor HTTP</h1>
+  <h2 style="color:var(--gris); font-weight:400;">Control de LEDs desde el navegador web</h2>
+  <p class="portada-sub">
+    <span class="badge">WebServer.h</span>
+    <span class="badge verde">WiFi.h</span>
+    <span class="badge naranja">UriBraces</span>
+    <span class="badge morado">Wokwi</span>
+  </p>
+  <p class="portada-sub" style="margin-top:1em;">
+    Tecnologías Emergentes · IoT con ESP32
+  </p>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SLIDE 2 — ¿QUÉ VAMOS A CONSTRUIR?
+══════════════════════════════════════════════════════════════════ -->
+<section>
+  <h2>¿Qué construye este programa?</h2>
+  <div class="flujo" style="margin: 1em 0;">
+    <div class="flujo-box" style="border-color:var(--azul);">🧑‍💻<br>Navegador</div>
+    <div class="flujo-arrow">⟷</div>
+    <div class="flujo-box" style="border-color:var(--verde);">📡<br>ESP32<br><small>HTTP :80</small></div>
+    <div class="flujo-arrow">⟷</div>
+    <div class="flujo-box" style="border-color:var(--amber);">💡<br>LED 1<br>GPIO 26</div>
+    <div class="flujo-arrow">+</div>
+    <div class="flujo-box" style="border-color:var(--amber);">💡<br>LED 2<br>GPIO 27</div>
+  </div>
+  <div class="cols2" style="margin-top:0.8em;">
+    <div class="card verde">
+      <p>✅ El ESP32 <span class="hl-verde">sirve una página web</span> con dos botones</p>
+    </div>
+    <div class="card azul">
+      <p>✅ Cada botón hace una petición <span class="highlight">HTTP GET</span> al ESP32</p>
+    </div>
+    <div class="card naranja">
+      <p>✅ El ESP32 <span class="hl-naranja">invierte el estado</span> del LED y actualiza la página</p>
+    </div>
+    <div class="card morado">
+      <p>✅ Sin necesidad de JavaScript ni frameworks externos</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SLIDE 3 — LIBRERÍAS (INCLUDES)
+══════════════════════════════════════════════════════════════════ -->
+<section>
+  <div class="seccion-titulo"><h2>Paso 1 · Librerías</h2></div>
+  <pre style="margin-top:0.8em;"><code class="language-cpp" data-trim>
+#include &lt;WiFi.h&gt;          // Conexión a red WiFi
+#include &lt;WiFiClient.h&gt;    // Cliente TCP (usado internamente)
+#include &lt;WebServer.h&gt;     // Servidor HTTP del ESP32
+#include &lt;uri/UriBraces.h&gt; // Rutas dinámicas /ruta/{param}
+  </code></pre>
+  <div class="cols2" style="margin-top:0.8em;">
+    <div class="card azul">
+      <p><span class="highlight">WiFi.h</span><br>
+      Gestiona la conexión WiFi — escanea redes, conecta, obtiene IP.</p>
+    </div>
+    <div class="card verde">
+      <p><span class="hl-verde">WebServer.h</span><br>
+      Servidor HTTP completo integrado en Arduino ESP32. Registra rutas y responde peticiones.</p>
+    </div>
+    <div class="card naranja">
+      <p><span class="hl-naranja">UriBraces.h</span><br>
+      Extiende WebServer para soportar rutas con parámetros variables como <code>/toggle/{n}</code>.</p>
+    </div>
+    <div class="card morado">
+      <p><span class="hl-morado">WiFiClient.h</span><br>
+      Clase base TCP. WebServer la usa internamente para gestionar cada conexión entrante.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SLIDE 4 — CONSTANTES Y VARIABLES GLOBALES
+══════════════════════════════════════════════════════════════════ -->
+<section>
+  <div class="seccion-titulo"><h2>Paso 2 · Configuración global</h2></div>
+  <pre style="margin-top:0.8em;"><code class="language-cpp" data-trim>
+// ── Credenciales WiFi ─────────────────────────────────
+#define WIFI_SSID     "Wokwi-GUEST"
+#define WIFI_PASSWORD ""
+#define WIFI_CHANNEL  6   // Fijar canal acelera la conexión
+
+// ── Servidor en puerto 80 (HTTP estándar) ─────────────
+WebServer servidor(80);
+
+// ── Pines físicos de los LEDs ─────────────────────────
+const int LED1 = 26;
+const int LED2 = 27;
+
+// ── Estado en memoria (false = apagado) ───────────────
+bool estadoLed1 = false;
+bool estadoLed2 = false;
+  </code></pre>
+  <div class="cols3" style="margin-top:0.7em;">
+    <div class="card azul">
+      <p><code>#define</code> crea constantes en tiempo de compilación — sin costo en RAM.</p>
+    </div>
+    <div class="card verde">
+      <p><code>WebServer servidor(80)</code> instancia el servidor. El <span class="hl-verde">80</span> es el puerto HTTP estándar.</p>
+    </div>
+    <div class="card naranja">
+      <p>Las variables <code>bool</code> guardan si cada LED está encendido. El pin físico se actualiza cuando cambian.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SLIDE 5 — sendHtml() PARTE 1: HTML EMBEBIDO
+══════════════════════════════════════════════════════════════════ -->
+<section class="dense">
+  <div class="seccion-titulo verde"><h2>Paso 3 · Función sendHtml() — HTML embebido</h2></div>
+  <pre style="margin-top:0.7em;"><code class="language-cpp" data-trim>
+void sendHtml() {
+  String respuesta = R"(
+    &lt;!DOCTYPE html&gt;&lt;html&gt;
+      &lt;head&gt;
+        &lt;title&gt;Demo Servidor Web ESP32&lt;/title&gt;
+        &lt;style&gt;
+          .btn { background-color: #5B5; color: #fff; font-size: 2em; }
+          .btn.OFF { background-color: #333; }
+        &lt;/style&gt;
+      &lt;/head&gt;
+      &lt;body&gt;
+        &lt;h1&gt;ESP32 Web Server&lt;/h1&gt;
+        &lt;a href="/toggle/1" class="btn TEXTO_LED1"&gt;TEXTO_LED1&lt;/a&gt;
+        &lt;a href="/toggle/2" class="btn TEXTO_LED2"&gt;TEXTO_LED2&lt;/a&gt;
+      &lt;/body&gt;
+    &lt;/html&gt;
+  )";
+  </code></pre>
+  <div class="cols2" style="margin-top:0.5em;">
+    <div class="card azul">
+      <p><span class="highlight">R"(...)"</span> = <em>raw string literal</em>.<br>
+      Permite escribir HTML con comillas y saltos de línea sin escapar nada.</p>
+    </div>
+    <div class="card naranja">
+      <p><code>TEXTO_LED1</code> y <code>TEXTO_LED2</code> son <span class="hl-naranja">marcadores de posición</span> que se reemplazan dinámicamente antes de enviar.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SLIDE 6 — sendHtml() PARTE 2: REPLACE + SEND
+══════════════════════════════════════════════════════════════════ -->
+<section>
+  <div class="seccion-titulo verde"><h2>Paso 3 · Función sendHtml() — replace y envío</h2></div>
+  <pre style="margin-top:0.8em;"><code class="language-cpp" data-trim>
+  // Reemplazar marcadores con el estado real
+  respuesta.replace("TEXTO_LED1", estadoLed1 ? "ON" : "OFF");
+  respuesta.replace("TEXTO_LED2", estadoLed2 ? "ON" : "OFF");
+
+  // Responder al navegador con HTTP 200 + contenido HTML
+  servidor.send(200, "text/html", respuesta);
+}
+  </code></pre>
+  <div class="cols2" style="margin-top:0.8em;">
+    <div class="card verde">
+      <p><code>respuesta.replace(A, B)</code> reemplaza <em>todas</em> las ocurrencias de A por B dentro del String.<br>
+      El marcador aparece dos veces en el HTML (en class y en texto), <span class="hl-verde">ambas se actualizan</span>.</p>
+    </div>
+    <div class="card azul">
+      <p><code>servidor.send(200, "text/html", respuesta)</code><br>
+      <span class="highlight">200</span> = código HTTP "OK"<br>
+      <code>"text/html"</code> = tipo MIME<br>
+      <code>respuesta</code> = cuerpo del mensaje</p>
+    </div>
+  </div>
+  <div class="card naranja" style="margin-top:0.5em;">
+    <p>Operador ternario: <code>estadoLed1 ? "ON" : "OFF"</code><br>
+    Si estadoLed1 es <code>true</code> → produce <code>"ON"</code>, si es <code>false</code> → produce <code>"OFF"</code>.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SLIDE 7 — setup(): SERIAL + GPIO
+══════════════════════════════════════════════════════════════════ -->
+<section>
+  <div class="seccion-titulo naranja"><h2>Paso 4 · setup() — Serial y GPIO</h2></div>
+  <pre style="margin-top:0.8em;"><code class="language-cpp" data-trim>
+void setup(void) {
+  Serial.begin(115200);   // Puerto serie a 115200 bps para depuración
+  pinMode(LED1, OUTPUT);  // GPIO 26 → modo salida
+  pinMode(LED2, OUTPUT);  // GPIO 27 → modo salida
+  </code></pre>
+  <div class="cols3" style="margin-top:0.8em;">
+    <div class="card azul">
+      <p><span class="highlight">Serial.begin(115200)</span><br>
+      Abre el puerto serie. El 115200 es la velocidad en baudios (bits por segundo).</p>
+    </div>
+    <div class="card verde">
+      <p><span class="hl-verde">pinMode(pin, OUTPUT)</span><br>
+      Configura el GPIO como salida digital. Sin esto, el pin está en alta impedancia.</p>
+    </div>
+    <div class="card naranja">
+      <p><span class="hl-naranja">void setup(void)</span><br>
+      Arduino llama esta función <strong>una sola vez</strong> al arrancar. Aquí va toda la inicialización.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SLIDE 8 — setup(): CONEXIÓN WIFI
+══════════════════════════════════════════════════════════════════ -->
+<section>
+  <div class="seccion-titulo naranja"><h2>Paso 5 · setup() — Conexión WiFi</h2></div>
+  <pre style="margin-top:0.8em;"><code class="language-cpp" data-trim>
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD, WIFI_CHANNEL);
+  Serial.print("Conectando a WiFi ");
+  Serial.print(WIFI_SSID);
+
+  // Esperar hasta obtener conexión (bucle bloqueante)
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(100);
+    Serial.print(".");
+  }
+  Serial.println(" ¡Conectado!");
+  Serial.print("IP: ");
+  Serial.println(WiFi.localIP());
+  </code></pre>
+  <div class="cols2" style="margin-top:0.7em;">
+    <div class="card azul">
+      <p><code>WiFi.begin(ssid, pass, canal)</code><br>
+      Inicia el proceso de asociación con el punto de acceso. Proporcionar el canal evita el escaneo completo → <span class="highlight">conexión más rápida</span>.</p>
+    </div>
+    <div class="card verde">
+      <p><code>while (WiFi.status() != WL_CONNECTED)</code><br>
+      Bucle de espera activa. Revisa el estado cada 100 ms e imprime un punto. Cuando la IP es asignada, <code>WL_CONNECTED</code> se cumple y el bucle termina.</p>
+    </div>
+  </div>
+  <div class="card morado" style="margin-top:0.4em;">
+    <p><code>WiFi.localIP()</code> devuelve la <span class="hl-morado">dirección IP</span> asignada por el router (o simulador Wokwi). Desde esa IP se accede al servidor.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SLIDE 9 — setup(): REGISTRAR RUTAS
+══════════════════════════════════════════════════════════════════ -->
+<section class="dense">
+  <div class="seccion-titulo naranja"><h2>Paso 6 · setup() — Registrar rutas HTTP</h2></div>
+  <pre style="margin-top:0.6em;"><code class="language-cpp" data-trim>
+  // Ruta raíz "/" → muestra la página principal
+  servidor.on("/", sendHtml);
+
+  // Ruta dinámica con parámetro → cambia estado del LED
+  servidor.on(UriBraces("/toggle/{}"), []() {
+    String led = servidor.pathArg(0);   // Captura el número entre llaves
+    Serial.print("Cambiar LED #");
+    Serial.println(led);
+
+    switch (led.toInt()) {
+      case 1:
+        estadoLed1 = !estadoLed1;
+        digitalWrite(LED1, estadoLed1);
+        break;
+      case 2:
+        estadoLed2 = !estadoLed2;
+        digitalWrite(LED2, estadoLed2);
+        break;
+    }
+    sendHtml();  // Responder con la página actualizada
+  });
+
+  servidor.begin();
+  </code></pre>
+  <div class="cols3" style="margin-top:0.4em;">
+    <div class="card azul">
+      <p><code>servidor.on(ruta, handler)</code><br>
+      Asocia una URL con una función que se ejecuta al recibir esa petición.</p>
+    </div>
+    <div class="card verde">
+      <p><code>UriBraces("/toggle/{}")</code><br>
+      Las llaves <code>{}</code> capturan cualquier texto. <code>pathArg(0)</code> lo recupera.</p>
+    </div>
+    <div class="card naranja">
+      <p><code>!estadoLedX</code> = <span class="hl-naranja">toggle</span>.<br>
+      <code>digitalWrite</code> aplica ese nuevo estado al pin físico (HIGH/LOW).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SLIDE 10 — loop()
+══════════════════════════════════════════════════════════════════ -->
+<section>
+  <div class="seccion-titulo"><h2>Paso 7 · loop() — El corazón del servidor</h2></div>
+  <pre style="margin-top:0.8em;"><code class="language-cpp" data-trim>
+void loop(void) {
+  servidor.handleClient();  // Revisar y procesar peticiones HTTP
+  delay(2);                 // 2 ms de pausa para estabilidad
+}
+  </code></pre>
+  <div class="cols2" style="margin-top:1em;">
+    <div class="card azul">
+      <p><span class="highlight">servidor.handleClient()</span><br>
+      Verifica si algún cliente (navegador) envió una petición HTTP.<br>
+      Si hay una → la enruta al handler registrado con <code>servidor.on()</code>.<br>
+      Debe llamarse <strong>continuamente</strong> para que el servidor responda.</p>
+    </div>
+    <div class="card verde">
+      <p><span class="hl-verde">delay(2)</span><br>
+      Pausa de 2 milisegundos.<br>
+      Sin ella el loop correría sin descanso y podría desestabilizar el RTOS del ESP32.<br>
+      No es perceptible para el usuario.</p>
+    </div>
+  </div>
+  <div class="card naranja" style="margin-top:0.6em;">
+    <p>⚙️ <code>loop()</code> en Arduino se ejecuta <span class="hl-naranja">millones de veces por segundo</span>.
+    Todo lo que pase aquí debe ser rápido y no bloqueante.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SLIDE 11 — FLUJO COMPLETO DE UNA PETICIÓN
+══════════════════════════════════════════════════════════════════ -->
+<section>
+  <h2>Flujo completo de una petición</h2>
+  <div style="margin: 0.6em 0;">
+    <div class="paso">
+      <div class="paso-num">1</div>
+      <div><p>El usuario abre <code>http://localhost:8180</code> → el navegador envía <code>GET /</code></p></div>
+    </div>
+    <div class="paso">
+      <div class="paso-num">2</div>
+      <div><p><code>handleClient()</code> detecta la petición y llama a <code>sendHtml()</code></p></div>
+    </div>
+    <div class="paso">
+      <div class="paso-num">3</div>
+      <div><p><code>sendHtml()</code> construye el HTML, reemplaza ON/OFF según estado, responde con HTTP 200</p></div>
+    </div>
+    <div class="paso">
+      <div class="paso-num verde">4</div>
+      <div><p>El usuario hace clic en un botón → navegador envía <code>GET /toggle/1</code></p></div>
+    </div>
+    <div class="paso">
+      <div class="paso-num verde">5</div>
+      <div><p>Handler captura <code>pathArg(0) = "1"</code>, invierte <code>estadoLed1</code>, llama <code>digitalWrite()</code></p></div>
+    </div>
+    <div class="paso">
+      <div class="paso-num verde">6</div>
+      <div><p><code>sendHtml()</code> vuelve a enviar la página con el estado actualizado → el botón cambia de color</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SLIDE 12 — CONCEPTOS CLAVE RESUMEN
+══════════════════════════════════════════════════════════════════ -->
+<section>
+  <h2>Conceptos clave</h2>
+  <div class="cols2">
+    <div class="card azul">
+      <h3>Raw String Literal <code>R"(...)"</code></h3>
+      <p>Permite escribir texto multilínea con comillas sin escapar. Ideal para HTML embebido en C++.</p>
+    </div>
+    <div class="card verde">
+      <h3>Operador Toggle <code>!variable</code></h3>
+      <p>Invierte un booleano: <code>true → false → true</code>. Patrón estándar para encender/apagar.</p>
+    </div>
+    <div class="card naranja">
+      <h3>Rutas dinámicas <code>UriBraces</code></h3>
+      <p>Captura parámetros en la URL. Un solo handler atiende <code>/toggle/1</code> y <code>/toggle/2</code>.</p>
+    </div>
+    <div class="card morado">
+      <h3>Lambda <code>[]() { ... }</code></h3>
+      <p>Función anónima definida en el lugar. Útil cuando el handler es corto y no se reutiliza.</p>
+    </div>
+  </div>
+  <div class="card rojo" style="margin-top:0.6em;">
+    <h3>Patrón Request → Toggle → Respond</h3>
+    <p>El ESP32 actúa simultáneamente como <span class="hl-rojo">servidor web</span> y como <span class="hl-rojo">controlador de hardware</span>. Sin MQTT, sin backend externo.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SLIDE 13 — CÓMO PROBAR EN WOKWI
+══════════════════════════════════════════════════════════════════ -->
+<section>
+  <h2>¿Cómo probarlo en Wokwi?</h2>
+  <div class="cols2">
+    <div>
+      <div class="paso"><div class="paso-num">1</div><div><p>Abrir el proyecto en <strong>VS Code</strong> con la extensión Wokwi instalada</p></div></div>
+      <div class="paso"><div class="paso-num">2</div><div><p>Presionar <code>F1</code> → <em>Wokwi: Start Simulation</em></p></div></div>
+      <div class="paso"><div class="paso-num">3</div><div><p>Esperar que el Serial muestre <code>¡Conectado!</code> y la IP</p></div></div>
+      <div class="paso"><div class="paso-num verde">4</div><div><p>Abrir el navegador en <code>http://localhost:8180</code></p></div></div>
+      <div class="paso"><div class="paso-num verde">5</div><div><p>Hacer clic en los botones ON/OFF y ver los LEDs cambiar en el simulador</p></div></div>
+    </div>
+    <div>
+      <div class="terminal">
+        <span class="comment"># Salida esperada en Serial Monitor</span><br>
+        <span class="prompt">ESP32 ›</span> Conectando a WiFi Wokwi-GUEST<span class="output">.........</span><br>
+        <span class="output">¡Conectado!</span><br>
+        <span class="prompt">ESP32 ›</span> <span class="output">IP: 10.13.37.1</span><br>
+        <span class="output">Servidor HTTP iniciado</span><br>
+        <span class="prompt">ESP32 ›</span> Cambiar LED #1<br>
+        <span class="prompt">ESP32 ›</span> Cambiar LED #1<br>
+        <span class="prompt">ESP32 ›</span> Cambiar LED #2
+      </div>
+      <div class="card azul" style="margin-top:0.6em;">
+        <p>El puerto <span class="highlight">8180</span> se configura en <code>wokwi.toml</code> como túnel hacia el puerto 80 del ESP32 simulado.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SLIDE 14 — ESTRUCTURA DEL PROGRAMA (RESUMEN VISUAL)
+══════════════════════════════════════════════════════════════════ -->
+<section>
+  <h2>Estructura del programa</h2>
+  <div class="cols2">
+    <div>
+      <div class="card naranja" style="margin-bottom:0.5em;">
+        <h3>📦 Variables globales</h3>
+        <p><code>WebServer servidor(80)</code><br>
+        <code>const int LED1 = 26</code><br>
+        <code>bool estadoLed1 = false</code></p>
+      </div>
+      <div class="card verde">
+        <h3>📄 sendHtml()</h3>
+        <p>Construye HTML → reemplaza ON/OFF → envía respuesta HTTP 200</p>
+      </div>
+    </div>
+    <div>
+      <div class="card azul" style="margin-bottom:0.5em;">
+        <h3>⚙️ setup() — 1 vez</h3>
+        <p>Serial + GPIO → WiFi → registrar rutas → servidor.begin()</p>
+      </div>
+      <div class="card morado">
+        <h3>🔄 loop() — continuo</h3>
+        <p>servidor.handleClient() → detecta peticiones → llama handlers → delay(2)</p>
+      </div>
+    </div>
+  </div>
+  <div class="flujo" style="margin-top:0.8em;">
+    <div class="flujo-box">Arranque</div>
+    <div class="flujo-arrow">→</div>
+    <div class="flujo-box">setup()</div>
+    <div class="flujo-arrow">→</div>
+    <div class="flujo-box" style="border-color:var(--verde);">loop() ∞</div>
+    <div class="flujo-arrow">→</div>
+    <div class="flujo-box">handleClient()</div>
+    <div class="flujo-arrow">→</div>
+    <div class="flujo-box" style="border-color:var(--amber);">handler()</div>
+    <div class="flujo-arrow">→</div>
+    <div class="flujo-box">sendHtml()</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SLIDE 15 — CIERRE
+══════════════════════════════════════════════════════════════════ -->
+<section>
+  <div style="font-size:2.5em; margin-bottom:0.4em;">🚀</div>
+  <h1 class="glow-verde">¡Listo para explorar!</h1>
+  <p style="color:var(--gris); margin-top:0.8em;">Con solo ~110 líneas de código el ESP32 es un servidor web completo</p>
+  <div class="cols3" style="margin-top:1em;">
+    <div class="card verde">
+      <p>💡 Agrega más LEDs cambiando los <code>case</code> del <code>switch</code></p>
+    </div>
+    <div class="card azul">
+      <p>📊 Lee sensores en el handler y muéstralos en el HTML</p>
+    </div>
+    <div class="card morado">
+      <p>🌐 Combina con MQTT para publicar eventos desde la web</p>
+    </div>
+  </div>
+  <p class="portada-sub" style="margin-top:1.5em;">
+    <span class="badge">esp32-http-server.ino</span>
+    <span class="badge verde">Wokwi</span>
+    <span class="badge naranja">PlatformIO</span>
+  </p>
+</section>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    transition: 'slide',
+    backgroundTransition: 'fade',
+    plugins: [ RevealHighlight, RevealNotes ],
+    highlight: { highlightOnLoad: true }
+  });
+</script>
+</body>
+</html>

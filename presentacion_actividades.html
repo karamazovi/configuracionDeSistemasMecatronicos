@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ESP32 HTTP — Actividad 1 y 2</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/night.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css" />
+
+  <style>
+    :root {
+      --bg:      #0d1117;
+      --bg2:     #161b22;
+      --bg3:     #21262d;
+      --azul:    #58a6ff;
+      --verde:   #3fb950;
+      --morado:  #bc8cff;
+      --amber:   #d29922;
+      --rojo:    #ff7b72;
+      --gris:    #8b949e;
+      --border:  #30363d;
+      --text:    #e6edf3;
+    }
+
+    .reveal { font-family: 'Inter', system-ui, sans-serif; color: var(--text); background: var(--bg); }
+    .reveal .slides { background: transparent; }
+    .reveal .progress { height: 3px; }
+    .reveal .progress span { background: var(--azul); box-shadow: 0 0 8px var(--azul); }
+
+    .reveal h1 { font-size: 1.8em; font-weight: 700; letter-spacing: -0.02em; }
+    .reveal h2 { font-size: 1.25em; font-weight: 600; }
+    .reveal h3 { font-size: 1em; color: var(--azul); font-weight: 600; }
+    .reveal p, .reveal li { font-size: 0.82em; line-height: 1.6; }
+    .reveal ul { margin-left: 1.2em; }
+    .reveal code {
+      font-family: 'JetBrains Mono', monospace !important;
+      font-size: 0.82em !important;
+      background: var(--bg3); padding: 0.1em 0.35em;
+      border-radius: 4px; color: var(--azul);
+    }
+    .reveal pre {
+      border-radius: 10px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.6), 0 0 0 1px var(--border);
+    }
+    .reveal pre code { font-size: 0.74em !important; background: transparent; padding: 0; color: inherit; }
+
+    /* Cards */
+    .card {
+      background: rgba(22,27,34,.85); backdrop-filter: blur(12px);
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 0.6em 1em; margin: 0.3em 0;
+    }
+    .card.azul   { border-left: 3px solid var(--azul);   box-shadow: 0 0 16px rgba(88,166,255,.1); }
+    .card.verde  { border-left: 3px solid var(--verde);  box-shadow: 0 0 16px rgba(63,185,80,.1); }
+    .card.naranja{ border-left: 3px solid var(--amber);  box-shadow: 0 0 16px rgba(210,153,34,.1); }
+    .card.morado { border-left: 3px solid var(--morado); box-shadow: 0 0 16px rgba(188,140,255,.1); }
+    .card.rojo   { border-left: 3px solid var(--rojo);   box-shadow: 0 0 16px rgba(255,123,114,.1); }
+
+    /* Grids */
+    .cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8em; }
+    .cols3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.7em; }
+    .cols4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 0.6em; }
+
+    /* Badges */
+    .badge {
+      display: inline-block; border-radius: 20px;
+      padding: 0.1em 0.7em; font-size: 0.72em; margin: 0.1em;
+      font-weight: 600; font-family: 'JetBrains Mono', monospace;
+    }
+    .badge.azul   { background: rgba(88,166,255,.15);  border: 1px solid rgba(88,166,255,.4);  color: var(--azul); }
+    .badge.verde  { background: rgba(63,185,80,.15);   border: 1px solid rgba(63,185,80,.4);   color: var(--verde); }
+    .badge.naranja{ background: rgba(210,153,34,.15);  border: 1px solid rgba(210,153,34,.4);  color: var(--amber); }
+    .badge.morado { background: rgba(188,140,255,.15); border: 1px solid rgba(188,140,255,.4); color: var(--morado); }
+    .badge.rojo   { background: rgba(255,123,114,.15); border: 1px solid rgba(255,123,114,.4); color: var(--rojo); }
+
+    /* Actividad labels grandes */
+    .act-tag {
+      font-size: 0.7em; font-weight: 700; border-radius: 6px;
+      padding: 0.2em 0.8em; letter-spacing: 0.05em;
+      display: inline-block; margin-bottom: 0.4em;
+    }
+    .act-tag.uno  { background: rgba(88,166,255,.2);  color: var(--azul);  border: 1px solid var(--azul); }
+    .act-tag.dos  { background: rgba(63,185,80,.2);   color: var(--verde); border: 1px solid var(--verde); }
+
+    /* Colores de texto */
+    .hl        { color: var(--azul);   font-weight: 700; }
+    .hl-verde  { color: var(--verde);  font-weight: 700; }
+    .hl-naranja{ color: var(--amber);  font-weight: 700; }
+    .hl-morado { color: var(--morado); font-weight: 700; }
+    .hl-rojo   { color: var(--rojo);   font-weight: 700; }
+    .gris      { color: var(--gris); }
+
+    /* Pasos numerados */
+    .paso { display: flex; align-items: flex-start; gap: 0.6em; margin: 0.35em 0; }
+    .paso-num {
+      background: var(--azul); color: #000; border-radius: 50%;
+      width: 1.5em; height: 1.5em; display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.78em; flex-shrink: 0; margin-top: 0.1em;
+    }
+    .paso-num.verde  { background: var(--verde); }
+    .paso-num.naranja{ background: var(--amber); }
+
+    /* Terminal */
+    .terminal {
+      background: #010409; border: 1px solid var(--border); border-radius: 10px;
+      padding: 0.8em 1em; font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68em; text-align: left; line-height: 1.7;
+    }
+    .terminal::before { content: '● ● ●'; display: block; color: #ff7b72; font-size: 0.75em; margin-bottom: 0.5em; letter-spacing: 0.2em; }
+    .terminal .ok  { color: #7ee787; }
+    .terminal .dim { color: var(--gris); font-style: italic; }
+    .terminal .ip  { color: var(--azul); }
+
+    /* Flujo horizontal */
+    .flujo { display: flex; align-items: center; justify-content: center; gap: 0.3em; flex-wrap: wrap; margin: 0.5em 0; }
+    .flujo-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 0.35em 0.7em; font-family: 'JetBrains Mono', monospace; font-size: 0.7em; text-align: center; }
+    .flujo-arr { color: var(--azul); font-size: 1.1em; font-weight: 700; }
+
+    /* Separador de sección */
+    .sec-header {
+      border-left: 5px solid var(--azul); background: linear-gradient(135deg,#0d1b4b,#0a1628);
+      border-radius: 0 10px 10px 0; padding: 0.4em 0.8em; box-shadow: 0 0 30px rgba(88,166,255,.15);
+    }
+    .sec-header.verde { border-color: var(--verde); background: linear-gradient(135deg,#0a2e1a,#071f12); box-shadow: 0 0 30px rgba(63,185,80,.15); }
+
+    /* Dense slides */
+    .reveal section.dense { font-size: 0.77em; }
+    .reveal section.dense h2 { font-size: 1.1em; margin-bottom: 0.25em; }
+    .reveal section.dense .card { padding: 0.3em 0.7em; margin: 0.12em 0; }
+
+    /* Tabla */
+    .reveal table { font-size: 0.72em; width: 100%; border-collapse: collapse; }
+    .reveal table th { background: rgba(88,166,255,.12); color: var(--azul); font-weight: 600; }
+    .reveal table td, .reveal table th { padding: 0.4em 0.7em; border: 1px solid var(--border); }
+    .reveal table tr:nth-child(even) td { background: rgba(255,255,255,.02); }
+
+    .portada-sub { font-size: 0.55em; color: var(--gris); margin-top: 0.5em; }
+    .glow-azul  { text-shadow: 0 0 20px rgba(88,166,255,.6); }
+    .glow-verde { text-shadow: 0 0 20px rgba(63,185,80,.6); }
+  </style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ╔══════════════════════════════════════════════════════════════════╗
+     ║  PORTADA GENERAL                                               ║
+     ╚══════════════════════════════════════════════════════════════════╝ -->
+<section>
+  <div style="font-size:2.8em;margin-bottom:0.4em;">📡</div>
+  <h1 class="glow-azul">ESP32 Servidor HTTP</h1>
+  <h2 class="gris" style="font-weight:400;">Control de hardware desde el navegador web</h2>
+  <div style="margin-top:1em;">
+    <span class="act-tag uno">ACTIVIDAD 1 — LEDs</span>
+    <span style="color:var(--gris);margin:0 0.5em;">→</span>
+    <span class="act-tag dos">ACTIVIDAD 2 — LEDs + Motor a Pasos</span>
+  </div>
+  <p class="portada-sub" style="margin-top:1.2em;">
+    <span class="badge azul">WebServer.h</span>
+    <span class="badge verde">WiFi.h</span>
+    <span class="badge naranja">Stepper.h</span>
+    <span class="badge morado">Wokwi</span>
+    <span class="badge azul">PlatformIO</span>
+  </p>
+  <p class="portada-sub">Tecnologías Emergentes · IoT con ESP32</p>
+</section>
+
+<!-- ╔══════════════════════════════════════════════════════════════════╗
+     ║  ████  ACTIVIDAD 1 — CONTROL DE LEDs  ████                    ║
+     ╚══════════════════════════════════════════════════════════════════╝ -->
+
+<!-- A1-1: Portada Actividad 1 -->
+<section>
+  <div class="act-tag uno" style="font-size:1em;">ACTIVIDAD 1</div>
+  <h1 style="color:var(--azul);">Control de LEDs</h1>
+  <h2 class="gris" style="font-weight:400;">Desde el navegador, sin cables</h2>
+  <div class="flujo" style="margin-top:1em;">
+    <div class="flujo-box" style="border-color:var(--azul);">🧑‍💻 Navegador</div>
+    <div class="flujo-arr">⟷</div>
+    <div class="flujo-box" style="border-color:var(--azul);">📡 ESP32<br><small>HTTP :80</small></div>
+    <div class="flujo-arr">⟷</div>
+    <div class="flujo-box" style="border-color:var(--amber);">💡 LED 1<br><small>GPIO 26</small></div>
+    <div class="flujo-arr">+</div>
+    <div class="flujo-box" style="border-color:var(--amber);">💡 LED 2<br><small>GPIO 27</small></div>
+  </div>
+  <p class="portada-sub" style="margin-top:1em;">
+    <span class="badge azul">esp32-http-server.ino</span>
+    <span class="badge verde">WebServer.h</span>
+    <span class="badge naranja">UriBraces</span>
+  </p>
+</section>
+
+<!-- A1-2: Librerías -->
+<section>
+  <div class="sec-header"><h2>A1 · Paso 1 — Librerías</h2></div>
+  <pre style="margin-top:0.8em;"><code class="language-cpp" data-trim>
+#include &lt;WiFi.h&gt;          // Conexión a red WiFi
+#include &lt;WiFiClient.h&gt;    // Cliente TCP (interno a WebServer)
+#include &lt;WebServer.h&gt;     // Servidor HTTP integrado del ESP32
+#include &lt;uri/UriBraces.h&gt; // Rutas con parámetros: /ruta/{param}
+  </code></pre>
+  <div class="cols2" style="margin-top:0.8em;">
+    <div class="card azul">
+      <p><span class="hl">WiFi.h</span> — gestiona conexión: escanea, asocia, obtiene IP.</p>
+    </div>
+    <div class="card verde">
+      <p><span class="hl-verde">WebServer.h</span> — servidor HTTP completo. Registra rutas y despacha peticiones.</p>
+    </div>
+    <div class="card naranja">
+      <p><span class="hl-naranja">UriBraces</span> — extiende WebServer para soportar <code>/ruta/{n}</code>. Captura el valor con <code>pathArg(0)</code>.</p>
+    </div>
+    <div class="card morado">
+      <p><span class="hl-morado">WiFiClient.h</span> — clase TCP base que WebServer usa internamente por cada conexión.</p>
+    </div>
+  </div>
+</section>
+
+<!-- A1-3: Variables globales -->
+<section>
+  <div class="sec-header"><h2>A1 · Paso 2 — Configuración global</h2></div>
+  <pre style="margin-top:0.8em;"><code class="language-cpp" data-trim>
+#define WIFI_SSID     "Wokwi-GUEST"
+#define WIFI_PASSWORD ""
+#define WIFI_CHANNEL  6        // Canal fijo → conexión más rápida
+
+WebServer servidor(80);        // Puerto 80 = HTTP estándar
+
+const int LED1 = 26;           // GPIO del LED 1
+const int LED2 = 27;           // GPIO del LED 2
+
+bool estadoLed1 = false;       // false = apagado
+bool estadoLed2 = false;
+  </code></pre>
+  <div class="cols3" style="margin-top:0.7em;">
+    <div class="card azul"><p><code>#define</code> crea constantes en tiempo de compilación — cero costo en RAM.</p></div>
+    <div class="card verde"><p><code>WebServer servidor(80)</code> instancia el servidor. El <span class="hl-verde">80</span> es el puerto HTTP estándar.</p></div>
+    <div class="card naranja"><p>Las variables <code>bool</code> reflejan el estado lógico. El pin físico se actualiza con <code>digitalWrite</code>.</p></div>
+  </div>
+</section>
+
+<!-- A1-4: sendHtml() -->
+<section class="dense">
+  <div class="sec-header"><h2>A1 · Paso 3 — sendHtml(): HTML dinámico</h2></div>
+  <pre style="margin-top:0.6em;"><code class="language-cpp" data-trim>
+void sendHtml() {
+  String respuesta = R"(
+    &lt;a href="/toggle/1" class="btn LED1_TEXT"&gt;LED1_TEXT&lt;/a&gt;
+    &lt;a href="/toggle/2" class="btn LED2_TEXT"&gt;LED2_TEXT&lt;/a&gt;
+  )";
+
+  // Reemplazar marcadores con el estado real
+  respuesta.replace("LED1_TEXT", estadoLed1 ? "ON" : "OFF");
+  respuesta.replace("LED2_TEXT", estadoLed2 ? "ON" : "OFF");
+
+  servidor.send(200, "text/html", respuesta);  // HTTP 200 OK
+}
+  </code></pre>
+  <div class="cols3" style="margin-top:0.5em;">
+    <div class="card azul"><p><code>R"(...)"</code> <em>raw string literal</em> — HTML con comillas sin escapar nada.</p></div>
+    <div class="card verde"><p><code>.replace(A,B)</code> cambia <em>todas</em> las ocurrencias. El marcador aparece en <code>class</code> y en el texto.</p></div>
+    <div class="card naranja"><p><code>servidor.send(200, "text/html", body)</code> — código, tipo MIME y cuerpo.</p></div>
+  </div>
+</section>
+
+<!-- A1-5: setup() WiFi + rutas -->
+<section class="dense">
+  <div class="sec-header"><h2>A1 · Paso 4 — setup(): WiFi y rutas</h2></div>
+  <pre style="margin-top:0.6em;"><code class="language-cpp" data-trim>
+void setup() {
+  Serial.begin(115200);
+  pinMode(LED1, OUTPUT);
+  pinMode(LED2, OUTPUT);
+
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD, WIFI_CHANNEL);
+  while (WiFi.status() != WL_CONNECTED) { delay(100); }
+  Serial.println(WiFi.localIP());
+
+  servidor.on("/", sendHtml);
+
+  servidor.on(UriBraces("/toggle/{}"), []() {
+    String led = servidor.pathArg(0);
+    if (led == "1") { estadoLed1 = !estadoLed1; digitalWrite(LED1, estadoLed1); }
+    if (led == "2") { estadoLed2 = !estadoLed2; digitalWrite(LED2, estadoLed2); }
+    sendHtml();
+  });
+
+  servidor.begin();
+}
+  </code></pre>
+  <div class="cols2" style="margin-top:0.4em;">
+    <div class="card azul"><p><code>while (WiFi.status() != WL_CONNECTED)</code> — bucle bloqueante, espera la IP del DHCP.</p></div>
+    <div class="card verde"><p>Lambda <code>[](){...}</code> — función anónima usada como handler. <code>!estadoLed1</code> = toggle en una línea.</p></div>
+  </div>
+</section>
+
+<!-- A1-6: loop + flujo -->
+<section>
+  <div class="sec-header"><h2>A1 · Paso 5 — loop() y flujo completo</h2></div>
+  <pre style="margin-top:0.6em;"><code class="language-cpp" data-trim>
+void loop() {
+  servidor.handleClient();  // Procesar peticiones HTTP entrantes
+  delay(2);                 // Estabilidad del RTOS
+}
+  </code></pre>
+  <div style="margin-top:0.7em;">
+    <div class="paso"><div class="paso-num">1</div><div><p>Navegador abre <code>http://localhost:8180</code> → <code>GET /</code></p></div></div>
+    <div class="paso"><div class="paso-num">2</div><div><p><code>handleClient()</code> detecta la petición → llama <code>sendHtml()</code></p></div></div>
+    <div class="paso"><div class="paso-num">3</div><div><p>HTML con botones ON/OFF se envía al navegador</p></div></div>
+    <div class="paso"><div class="paso-num verde">4</div><div><p>Clic en botón → <code>GET /toggle/1</code></p></div></div>
+    <div class="paso"><div class="paso-num verde">5</div><div><p>Handler invierte <code>estadoLed1</code>, llama <code>digitalWrite</code></p></div></div>
+    <div class="paso"><div class="paso-num verde">6</div><div><p><code>sendHtml()</code> responde con la página actualizada</p></div></div>
+  </div>
+</section>
+
+<!-- A1-7: Cómo probar -->
+<section>
+  <div class="sec-header"><h2>A1 · Cómo probar en Wokwi</h2></div>
+  <div class="cols2" style="margin-top:0.8em;">
+    <div>
+      <div class="paso"><div class="paso-num">1</div><div><p>Abrir proyecto en VS Code con extensión Wokwi instalada</p></div></div>
+      <div class="paso"><div class="paso-num">2</div><div><p><code>F1</code> → <em>Wokwi: Start Simulation</em></p></div></div>
+      <div class="paso"><div class="paso-num">3</div><div><p>Esperar <code>¡Conectado!</code> en el Serial Monitor</p></div></div>
+      <div class="paso"><div class="paso-num verde">4</div><div><p>Abrir <code>http://localhost:8180</code> en el navegador</p></div></div>
+      <div class="paso"><div class="paso-num verde">5</div><div><p>Clic en los botones — los LEDs cambian en el simulador</p></div></div>
+    </div>
+    <div>
+      <div class="terminal">
+        <span class="dim"># Serial Monitor esperado</span><br>
+        Conectando a WiFi Wokwi-GUEST<span class="ok">......</span><br>
+        <span class="ok">¡Conectado!</span><br>
+        IP: <span class="ip">10.13.37.1</span><br>
+        <span class="ok">Servidor HTTP iniciado</span><br>
+        Toggle LED 1<br>
+        Toggle LED 2
+      </div>
+      <div class="card naranja" style="margin-top:0.6em;">
+        <p>Puerto <span class="hl-naranja">8180</span> configurado en <code>wokwi.toml</code> como túnel al puerto 80 del ESP32 simulado.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ╔══════════════════════════════════════════════════════════════════╗
+     ║  ████  ACTIVIDAD 2 — LEDs + MOTOR A PASOS  ████               ║
+     ╚══════════════════════════════════════════════════════════════════╝ -->
+
+<!-- A2-1: Portada Actividad 2 -->
+<section>
+  <div class="act-tag dos" style="font-size:1em;">ACTIVIDAD 2</div>
+  <h1 style="color:var(--verde);" class="glow-verde">LEDs + Motor a Pasos</h1>
+  <h2 class="gris" style="font-weight:400;">Control de actuadores desde la web</h2>
+  <div class="flujo" style="margin-top:0.8em;">
+    <div class="flujo-box" style="border-color:var(--verde);">🧑‍💻 Navegador</div>
+    <div class="flujo-arr" style="color:var(--verde);">⟷</div>
+    <div class="flujo-box" style="border-color:var(--verde);">📡 ESP32<br><small>HTTP :80</small></div>
+    <div class="flujo-arr" style="color:var(--verde);">⟷</div>
+    <div class="flujo-box" style="border-color:var(--amber);">💡 LED 1<br><small>GPIO 26</small></div>
+    <div class="flujo-arr">+</div>
+    <div class="flujo-box" style="border-color:var(--amber);">💡 LED 2<br><small>GPIO 27</small></div>
+    <div class="flujo-arr">+</div>
+    <div class="flujo-box" style="border-color:var(--morado);">⚙️ Motor<br><small>GPIO 5,16,17,18</small></div>
+  </div>
+  <p class="portada-sub" style="margin-top:1em;">
+    <span class="badge verde">esp32-leds-stepper.ino</span>
+    <span class="badge morado">Stepper.h</span>
+    <span class="badge naranja">NEMA 17 · 200 pasos/vuelta</span>
+  </p>
+</section>
+
+<!-- A2-2: ¿Cómo funciona un motor a pasos? -->
+<section>
+  <div class="sec-header verde"><h2>A2 · Teoría — Motor a Pasos</h2></div>
+  <div class="cols2" style="margin-top:0.8em;">
+    <div>
+      <div class="card verde">
+        <h3>¿Qué es?</h3>
+        <p>Motor eléctrico que gira en <span class="hl-verde">incrementos discretos (pasos)</span>. Cada paso mueve el eje un ángulo fijo y preciso.</p>
+      </div>
+      <div class="card azul" style="margin-top:0.5em;">
+        <h3>NEMA 17</h3>
+        <p><span class="hl">200 pasos/vuelta</span> → 1.8° por paso<br>
+        4 bobinas (bipolar) → pines A+, A–, B+, B–</p>
+      </div>
+      <div class="card naranja" style="margin-top:0.5em;">
+        <h3>Full-step (4 fases)</h3>
+        <p>Se activan las bobinas en secuencia:<br>
+        <code>AB → A̅B → A̅B̅ → AB̅ → AB...</code></p>
+      </div>
+    </div>
+    <div>
+      <table>
+        <thead>
+          <tr><th>Paso</th><th>A+</th><th>A–</th><th>B+</th><th>B–</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td style="color:var(--verde);">▲</td><td></td><td style="color:var(--verde);">▲</td><td></td></tr>
+          <tr><td>2</td><td></td><td style="color:var(--rojo);">▼</td><td style="color:var(--verde);">▲</td><td></td></tr>
+          <tr><td>3</td><td></td><td style="color:var(--rojo);">▼</td><td></td><td style="color:var(--rojo);">▼</td></tr>
+          <tr><td>4</td><td style="color:var(--verde);">▲</td><td></td><td></td><td style="color:var(--rojo);">▼</td></tr>
+        </tbody>
+      </table>
+      <div class="card morado" style="margin-top:0.6em;">
+        <p><span class="hl-morado">RPM</span> = pasos/seg ÷ 200 × 60<br>
+        A 10 RPM → ~33 pasos/seg → 1 paso cada 30 ms</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- A2-3b: Instalación Stepper.h en PlatformIO -->
+<section>
+  <div class="sec-header verde"><h2>A2 · Instalar Stepper.h en PlatformIO</h2></div>
+  <div class="card rojo" style="margin-top:0.7em;">
+    <p>⚠️ <span class="hl-rojo"><code>Stepper.h</code> NO viene en el core ESP32</span> — solo existe en el core AVR (Arduino UNO/Mega). Hay que agregarla manualmente.</p>
+  </div>
+  <p style="margin:0.6em 0 0.3em; font-size:0.8em;">Editar <code>platformio.ini</code> y agregar la librería en <code>lib_deps</code>:</p>
+  <pre><code class="language-ini" data-trim>
+[env:esp32]
+platform  = espressif32
+framework = arduino
+board     = esp32dev
+lib_deps  =
+  arduino-libraries/Stepper@^1.1.3
+  </code></pre>
+  <div class="cols2" style="margin-top:0.7em;">
+    <div class="card verde">
+      <div class="paso"><div class="paso-num verde">1</div><div><p>Agregar la línea <code>arduino-libraries/Stepper@^1.1.3</code> en <code>lib_deps</code></p></div></div>
+      <div class="paso"><div class="paso-num verde">2</div><div><p>Guardar <code>platformio.ini</code></p></div></div>
+      <div class="paso"><div class="paso-num verde">3</div><div><p>Ejecutar <code>pio run</code> — PlatformIO descarga la librería automáticamente</p></div></div>
+    </div>
+    <div>
+      <div class="terminal">
+        <span class="dim"># Terminal PlatformIO al compilar</span><br>
+        <span class="ok">Installing arduino-libraries/Stepper...</span><br>
+        <span class="ok">Stepper@1.1.3 installed!</span><br>
+        Compiling .pio/build/esp32/...<br>
+        <span class="ok">SUCCESS</span>
+      </div>
+      <div class="card azul" style="margin-top:0.5em;">
+        <p>El nombre exacto viene del registro: <span class="hl">registry.platformio.org</span><br>Buscar la librería → copiar el string de <code>lib_deps</code>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- A2-3: Librería Stepper.h -->
+<section>
+  <div class="sec-header verde"><h2>A2 · Librería Stepper.h</h2></div>
+  <pre style="margin-top:0.7em;"><code class="language-cpp" data-trim>
+#include &lt;Stepper.h&gt;
+
+// Constructor: pasos/vuelta, IN1(A+), IN2(B+), IN3(A-), IN4(B-)
+Stepper motor(200, 5, 17, 18, 16);
+
+// En setup():
+motor.setSpeed(10);   // Fijar velocidad en RPM
+
+// En un handler:
+motor.step(50);       // +50 pasos = sentido horario
+motor.step(-50);      // -50 pasos = sentido antihorario
+  </code></pre>
+  <div class="cols3" style="margin-top:0.7em;">
+    <div class="card verde">
+      <p><code>Stepper(N, p1, p2, p3, p4)</code><br>
+      <strong>N</strong> = pasos por vuelta<br>
+      Orden pines: IN1, IN2, IN3, IN4</p>
+    </div>
+    <div class="card azul">
+      <p><code>setSpeed(rpm)</code><br>
+      Calcula el delay entre pasos. Llamar antes del primer <code>step()</code>.</p>
+    </div>
+    <div class="card rojo">
+      <p><span class="hl-rojo">⚠ step() es bloqueante</span><br>
+      El ESP32 no atiende peticiones HTTP mientras gira. Mantener <code>pasosPorClick</code> pequeño.</p>
+    </div>
+  </div>
+</section>
+
+<!-- A2-4: Pines del motor -->
+<section>
+  <div class="sec-header verde"><h2>A2 · Conexión del motor (diagram.json)</h2></div>
+  <table style="margin-top:0.8em;">
+    <thead>
+      <tr><th>GPIO ESP32</th><th>Bobina Motor</th><th>Stepper.h (posición)</th><th>Color cable Wokwi</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>5</code></td> <td>A+</td><td>IN1 (arg 2)</td><td>🟢 verde</td></tr>
+      <tr><td><code>17</code></td><td>B+</td><td>IN2 (arg 3)</td><td>🟢 verde</td></tr>
+      <tr><td><code>18</code></td><td>A–</td><td>IN3 (arg 4)</td><td>🟢 verde</td></tr>
+      <tr><td><code>16</code></td><td>B–</td><td>IN4 (arg 5)</td><td>🟢 verde</td></tr>
+    </tbody>
+  </table>
+  <pre style="margin-top:0.8em;"><code class="language-cpp" data-trim>
+// Constructor en el código:
+Stepper motor(PASOS_POR_VUELTA, 5, 17, 18, 16);
+//                              A+ B+  A-  B-
+  </code></pre>
+  <div class="card naranja" style="margin-top:0.6em;">
+    <p>El orden de los pines en el constructor de <code>Stepper.h</code> es <span class="hl-naranja">IN1, IN2, IN3, IN4</span>, que corresponde a <strong>A+, B+, A–, B–</strong>. Intercambiar A– con B+ invierte el sentido de giro.</p>
+  </div>
+</section>
+
+<!-- A2-5: Variables globales nuevas -->
+<section>
+  <div class="sec-header verde"><h2>A2 · Paso 1 — Variables globales ampliadas</h2></div>
+  <pre style="margin-top:0.8em;"><code class="language-cpp" data-trim>
+// ── Heredado de Actividad 1 ─────────────────────────────
+WebServer servidor(80);
+const int LED1 = 26, LED2 = 27;
+bool estadoLed1 = false, estadoLed2 = false;
+
+// ── Nuevo en Actividad 2 ────────────────────────────────
+#define PASOS_POR_VUELTA 200
+Stepper motor(PASOS_POR_VUELTA, 5, 17, 18, 16);
+
+int velocidadRPM  = 10;   // Velocidad inicial
+int pasosPorClick = 50;   // Pasos por clic de botón
+  </code></pre>
+  <div class="cols2" style="margin-top:0.7em;">
+    <div class="card verde">
+      <p><code>Stepper motor(...)</code> es una variable global — el objeto persiste entre peticiones HTTP y mantiene internamente el estado de la secuencia de bobinas.</p>
+    </div>
+    <div class="card azul">
+      <p><code>pasosPorClick</code> e <code>velocidadRPM</code> son variables de estado que el usuario puede modificar desde la web con rutas como <code>/stepper/speed/15</code>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- A2-6: Nuevas rutas HTTP -->
+<section class="dense">
+  <div class="sec-header verde"><h2>A2 · Paso 2 — Nuevas rutas del servidor</h2></div>
+  <table style="margin-top:0.7em;">
+    <thead><tr><th>Ruta HTTP</th><th>Acción</th></tr></thead>
+    <tbody>
+      <tr><td><code>GET /</code></td><td>Página principal (LEDs + Motor)</td></tr>
+      <tr><td><code>GET /toggle/{n}</code></td><td>Invertir LED 1 ó 2 (igual que Act. 1)</td></tr>
+      <tr><td><code>GET /stepper/cw</code></td><td>Girar motor horario <code>pasosPorClick</code> pasos</td></tr>
+      <tr><td><code>GET /stepper/ccw</code></td><td>Girar motor antihorario <code>pasosPorClick</code> pasos</td></tr>
+      <tr><td><code>GET /stepper/speed/{n}</code></td><td>Cambiar velocidad (1–60 RPM)</td></tr>
+      <tr><td><code>GET /stepper/steps/{n}</code></td><td>Cambiar pasos por clic (1–400)</td></tr>
+    </tbody>
+  </table>
+  <pre style="margin-top:0.6em;"><code class="language-cpp" data-trim>
+servidor.on("/stepper/cw", []() {
+  motor.step(pasosPorClick);   // positivo → horario
+  enviarHtml();
+});
+
+servidor.on("/stepper/ccw", []() {
+  motor.step(-pasosPorClick);  // negativo → antihorario
+  enviarHtml();
+});
+
+servidor.on(UriBraces("/stepper/speed/{}"), []() {
+  int rpm = servidor.pathArg(0).toInt();
+  if (rpm >= 1 && rpm <= 60) {
+    velocidadRPM = rpm;
+    motor.setSpeed(velocidadRPM);
+  }
+  enviarHtml();
+});
+  </code></pre>
+</section>
+
+<!-- A2-7: HTML de la sección motor -->
+<section class="dense">
+  <div class="sec-header verde"><h2>A2 · Paso 3 — HTML: sección motor</h2></div>
+  <pre style="margin-top:0.6em;"><code class="language-html" data-trim>
+&lt;!-- Botones de dirección --&gt;
+&lt;a href="/stepper/ccw" class="btn ccw"&gt;◀ CCW&lt;/a&gt;
+&lt;a href="/stepper/cw"  class="btn cw"&gt;CW ▶&lt;/a&gt;
+
+&lt;!-- Estado actual (marcadores reemplazados por C++) --&gt;
+&lt;p&gt;Pasos: %PASOS% | Velocidad: %RPM% RPM&lt;/p&gt;
+
+&lt;!-- Botones de velocidad --&gt;
+&lt;a href="/stepper/speed/5"&gt;5 RPM&lt;/a&gt;
+&lt;a href="/stepper/speed/15"&gt;15 RPM&lt;/a&gt;
+&lt;a href="/stepper/speed/30"&gt;30 RPM&lt;/a&gt;
+
+&lt;!-- Botones de pasos por clic --&gt;
+&lt;a href="/stepper/steps/25"&gt;25 pasos&lt;/a&gt;
+&lt;a href="/stepper/steps/100"&gt;100 pasos&lt;/a&gt;
+&lt;a href="/stepper/steps/200"&gt;1 vuelta&lt;/a&gt;
+  </code></pre>
+  <div class="cols2" style="margin-top:0.4em;">
+    <div class="card verde"><p>Los marcadores <code>%PASOS%</code> y <code>%RPM%</code> se reemplazan en C++ con <code>html.replace()</code> antes de enviar, igual que los LEDs.</p></div>
+    <div class="card naranja"><p>Sin JavaScript — toda la lógica en el ESP32. El navegador solo muestra HTML estático recibido.</p></div>
+  </div>
+</section>
+
+<!-- A2-8: Flujo completo Actividad 2 -->
+<section>
+  <div class="sec-header verde"><h2>A2 · Flujo completo</h2></div>
+  <div style="margin-top:0.6em;">
+    <div class="paso"><div class="paso-num verde">1</div><div><p>Usuario abre <code>http://localhost:8180</code> → ve LEDs + sección motor</p></div></div>
+    <div class="paso"><div class="paso-num verde">2</div><div><p>Clic en <strong>CW ▶</strong> → navegador envía <code>GET /stepper/cw</code></p></div></div>
+    <div class="paso"><div class="paso-num verde">3</div><div><p><code>handleClient()</code> despacha al handler de <code>/stepper/cw</code></p></div></div>
+    <div class="paso"><div class="paso-num naranja">4</div><div><p><code>motor.step(50)</code> — <span class="hl-naranja">bloqueante ~150 ms</span> — mueve el eje 50 pasos en Wokwi</p></div></div>
+    <div class="paso"><div class="paso-num verde">5</div><div><p><code>enviarHtml()</code> construye y envía la página con estado actualizado</p></div></div>
+    <div class="paso"><div class="paso-num">6</div><div><p>Clic en <strong>15 RPM</strong> → <code>GET /stepper/speed/15</code> → <code>motor.setSpeed(15)</code> → página nueva</p></div></div>
+  </div>
+  <div class="card rojo" style="margin-top:0.6em;">
+    <p>⚠️ Durante <code>motor.step()</code> el servidor no responde. Con 50 pasos a 10 RPM ≈ <span class="hl-rojo">150 ms de bloqueo</span> — imperceptible para el usuario.</p>
+  </div>
+</section>
+
+<!-- A2-9: Cómo probar Actividad 2 -->
+<section>
+  <div class="sec-header verde"><h2>A2 · Cómo probar en Wokwi</h2></div>
+  <div class="cols2" style="margin-top:0.8em;">
+    <div>
+      <div class="paso"><div class="paso-num verde">1</div><div><p>En <code>platformio.ini</code> asegurarse que el <em>src_filter</em> apunte a <code>esp32-leds-stepper.ino</code></p></div></div>
+      <div class="paso"><div class="paso-num verde">2</div><div><p>Compilar: <code>pio run</code> — sin errores</p></div></div>
+      <div class="paso"><div class="paso-num verde">3</div><div><p><code>F1</code> → <em>Wokwi: Start Simulation</em></p></div></div>
+      <div class="paso"><div class="paso-num">4</div><div><p>Navegar a <code>http://localhost:8180</code></p></div></div>
+      <div class="paso"><div class="paso-num">5</div><div><p>Probar: LEDs ON/OFF + CW/CCW + cambiar RPM</p></div></div>
+      <div class="paso"><div class="paso-num">6</div><div><p>Verificar que el eje del motor gira en el simulador</p></div></div>
+    </div>
+    <div>
+      <div class="terminal">
+        <span class="dim"># Serial Monitor — Actividad 2</span><br>
+        Conectando a WiFi Wokwi-GUEST<span class="ok">......</span><br>
+        <span class="ok">¡Conectado!</span><br>
+        IP: <span class="ip">10.13.37.1</span><br>
+        <span class="ok">Servidor HTTP iniciado</span><br>
+        Toggle LED 1<br>
+        Motor CW 50 pasos @ 10 RPM<br>
+        Motor CCW 50 pasos @ 10 RPM<br>
+        Velocidad: 15 RPM<br>
+        Motor CW 200 pasos @ 15 RPM
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- A2-10: Diferencias A1 vs A2 + Ideas -->
+<section>
+  <h2>Actividad 1 vs Actividad 2 — Resumen</h2>
+  <table style="margin:0.7em 0;">
+    <thead><tr><th></th><th>Actividad 1</th><th>Actividad 2</th></tr></thead>
+    <tbody>
+      <tr><td>Actuadores</td><td>2 LEDs</td><td>2 LEDs + motor a pasos</td></tr>
+      <tr><td>Librerías extra</td><td>—</td><td><code>Stepper.h</code></td></tr>
+      <tr><td>Rutas HTTP</td><td>2 (<code>/</code>, <code>/toggle/{n}</code>)</td><td>6 rutas adicionales del motor</td></tr>
+      <tr><td>Estado global</td><td>2 <code>bool</code></td><td>+ <code>Stepper</code>, <code>int</code> velocidad y pasos</td></tr>
+      <tr><td>Bloqueo en loop</td><td>No</td><td>Sí — durante <code>motor.step()</code></td></tr>
+    </tbody>
+  </table>
+  <div class="cols3" style="margin-top:0.7em;">
+    <div class="card verde"><p>💡 Agrega un sensor (ej. potenciómetro) y muestra su lectura en el HTML</p></div>
+    <div class="card azul"><p>📶 Combina con MQTT: publica cada movimiento del motor como evento IoT</p></div>
+    <div class="card morado"><p>⚡ Usa <code>AccelStepper</code> para movimiento no bloqueante y control de velocidad suave</p></div>
+  </div>
+</section>
+
+<!-- Cierre -->
+<section>
+  <div style="font-size:2.5em;margin-bottom:0.4em;">🚀</div>
+  <h1 class="glow-verde">¡Actividades completadas!</h1>
+  <div class="cols2" style="margin-top:1em;">
+    <div class="card azul">
+      <div class="act-tag uno">ACTIVIDAD 1</div>
+      <p style="margin-top:0.3em;"><code>esp32-http-server.ino</code><br>Control de 2 LEDs via HTTP</p>
+    </div>
+    <div class="card verde">
+      <div class="act-tag dos">ACTIVIDAD 2</div>
+      <p style="margin-top:0.3em;"><code>esp32-leds-stepper.ino</code><br>Control de LEDs + Motor NEMA 17</p>
+    </div>
+  </div>
+  <p class="portada-sub" style="margin-top:1.2em;">
+    <span class="badge azul">WebServer.h</span>
+    <span class="badge verde">Stepper.h</span>
+    <span class="badge naranja">UriBraces</span>
+    <span class="badge morado">Wokwi</span>
+  </p>
+</section>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    transition: 'slide',
+    backgroundTransition: 'fade',
+    plugins: [ RevealHighlight, RevealNotes ],
+  });
+</script>
+</body>
+</html>
