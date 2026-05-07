@@ -31,31 +31,33 @@
 
     .reveal { font-family: 'Inter', system-ui, sans-serif; color: var(--text); background: var(--bg); }
     .reveal .slides { background: transparent; }
+    .reveal .slides section { padding-bottom: 3cm; box-sizing: border-box; }
     .reveal .progress { height: 3px; }
     .reveal .progress span { background: var(--azul); box-shadow: 0 0 8px var(--azul); }
 
     .reveal h1 { font-size: 1.8em; font-weight: 700; letter-spacing: -0.02em; }
-    .reveal h2 { font-size: 1.25em; font-weight: 600; }
-    .reveal h3 { font-size: 1em; color: var(--azul); font-weight: 600; }
-    .reveal p, .reveal li { font-size: 0.82em; line-height: 1.6; }
+    .reveal h2 { font-size: 1.2em; font-weight: 600; }
+    .reveal h3 { font-size: 0.95em; color: var(--azul); font-weight: 600; }
+    .reveal p, .reveal li { font-size: 0.8em; line-height: 1.5; }
     .reveal ul { margin-left: 1.2em; }
     .reveal code {
       font-family: 'JetBrains Mono', monospace !important;
-      font-size: 0.82em !important;
+      font-size: 0.8em !important;
       background: var(--bg3); padding: 0.1em 0.35em;
       border-radius: 4px; color: var(--azul);
     }
     .reveal pre {
       border-radius: 10px;
       box-shadow: 0 4px 24px rgba(0,0,0,.6), 0 0 0 1px var(--border);
+      margin: 0.4em auto;
     }
-    .reveal pre code { font-size: 0.74em !important; background: transparent; padding: 0; color: inherit; }
+    .reveal pre code { font-size: 0.72em !important; background: transparent; padding: 0; color: inherit; }
 
     /* Cards */
     .card {
       background: rgba(22,27,34,.85); backdrop-filter: blur(12px);
-      border: 1px solid var(--border); border-radius: 12px;
-      padding: 0.6em 1em; margin: 0.3em 0;
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 0.5em 0.9em; margin: 0.25em 0;
     }
     .card.azul   { border-left: 3px solid var(--azul);   box-shadow: 0 0 16px rgba(88,166,255,.1); }
     .card.verde  { border-left: 3px solid var(--verde);  box-shadow: 0 0 16px rgba(63,185,80,.1); }
@@ -64,9 +66,9 @@
     .card.rojo   { border-left: 3px solid var(--rojo);   box-shadow: 0 0 16px rgba(255,123,114,.1); }
 
     /* Grids */
-    .cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8em; }
-    .cols3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.7em; }
-    .cols4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 0.6em; }
+    .cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7em; }
+    .cols3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6em; }
+    .cols4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 0.5em; }
 
     /* Badges */
     .badge {
@@ -80,7 +82,7 @@
     .badge.morado { background: rgba(188,140,255,.15); border: 1px solid rgba(188,140,255,.4); color: var(--morado); }
     .badge.rojo   { background: rgba(255,123,114,.15); border: 1px solid rgba(255,123,114,.4); color: var(--rojo); }
 
-    /* Actividad labels grandes */
+    /* Actividad labels */
     .act-tag {
       font-size: 0.7em; font-weight: 700; border-radius: 6px;
       padding: 0.2em 0.8em; letter-spacing: 0.05em;
@@ -98,11 +100,11 @@
     .gris      { color: var(--gris); }
 
     /* Pasos numerados */
-    .paso { display: flex; align-items: flex-start; gap: 0.6em; margin: 0.35em 0; }
+    .paso { display: flex; align-items: flex-start; gap: 0.5em; margin: 0.28em 0; }
     .paso-num {
       background: var(--azul); color: #000; border-radius: 50%;
-      width: 1.5em; height: 1.5em; display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: 0.78em; flex-shrink: 0; margin-top: 0.1em;
+      width: 1.4em; height: 1.4em; display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.75em; flex-shrink: 0; margin-top: 0.1em;
     }
     .paso-num.verde  { background: var(--verde); }
     .paso-num.naranja{ background: var(--amber); }
@@ -110,38 +112,50 @@
     /* Terminal */
     .terminal {
       background: #010409; border: 1px solid var(--border); border-radius: 10px;
-      padding: 0.8em 1em; font-family: 'JetBrains Mono', monospace;
-      font-size: 0.68em; text-align: left; line-height: 1.7;
+      padding: 0.6em 0.9em; font-family: 'JetBrains Mono', monospace;
+      font-size: 0.64em; text-align: left; line-height: 1.6;
     }
-    .terminal::before { content: '● ● ●'; display: block; color: #ff7b72; font-size: 0.75em; margin-bottom: 0.5em; letter-spacing: 0.2em; }
+    .terminal::before { content: '● ● ●'; display: block; color: #ff7b72; font-size: 0.75em; margin-bottom: 0.4em; letter-spacing: 0.2em; }
     .terminal .ok  { color: #7ee787; }
     .terminal .dim { color: var(--gris); font-style: italic; }
     .terminal .ip  { color: var(--azul); }
 
     /* Flujo horizontal */
-    .flujo { display: flex; align-items: center; justify-content: center; gap: 0.3em; flex-wrap: wrap; margin: 0.5em 0; }
-    .flujo-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 0.35em 0.7em; font-family: 'JetBrains Mono', monospace; font-size: 0.7em; text-align: center; }
-    .flujo-arr { color: var(--azul); font-size: 1.1em; font-weight: 700; }
+    .flujo { display: flex; align-items: center; justify-content: center; gap: 0.3em; flex-wrap: wrap; margin: 0.4em 0; }
+    .flujo-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 0.3em 0.6em; font-family: 'JetBrains Mono', monospace; font-size: 0.68em; text-align: center; }
+    .flujo-arr { color: var(--azul); font-size: 1em; font-weight: 700; }
 
     /* Separador de sección */
     .sec-header {
       border-left: 5px solid var(--azul); background: linear-gradient(135deg,#0d1b4b,#0a1628);
-      border-radius: 0 10px 10px 0; padding: 0.4em 0.8em; box-shadow: 0 0 30px rgba(88,166,255,.15);
+      border-radius: 0 10px 10px 0; padding: 0.3em 0.8em; box-shadow: 0 0 30px rgba(88,166,255,.15);
     }
     .sec-header.verde { border-color: var(--verde); background: linear-gradient(135deg,#0a2e1a,#071f12); box-shadow: 0 0 30px rgba(63,185,80,.15); }
 
-    /* Dense slides */
-    .reveal section.dense { font-size: 0.77em; }
-    .reveal section.dense h2 { font-size: 1.1em; margin-bottom: 0.25em; }
-    .reveal section.dense .card { padding: 0.3em 0.7em; margin: 0.12em 0; }
+    /* Dense: slides con código + cards */
+    .reveal section.dense { font-size: 0.74em; }
+    .reveal section.dense h2 { font-size: 1.08em; margin-bottom: 0.2em; }
+    .reveal section.dense .card { padding: 0.25em 0.6em; margin: 0.1em 0; }
+    .reveal section.dense pre { margin: 0.3em auto; }
+    .reveal section.dense pre code { font-size: 0.68em !important; }
+    .reveal section.dense table { font-size: 0.68em; }
+
+    /* Xdense: slides con tabla + código largo */
+    .reveal section.xdense { font-size: 0.66em; }
+    .reveal section.xdense h2 { font-size: 1.05em; margin-bottom: 0.15em; }
+    .reveal section.xdense .card { padding: 0.2em 0.55em; margin: 0.08em 0; }
+    .reveal section.xdense pre { margin: 0.25em auto; }
+    .reveal section.xdense pre code { font-size: 0.66em !important; }
+    .reveal section.xdense table { font-size: 0.65em; }
+    .reveal section.xdense .paso { margin: 0.2em 0; }
 
     /* Tabla */
-    .reveal table { font-size: 0.72em; width: 100%; border-collapse: collapse; }
+    .reveal table { font-size: 0.7em; width: 100%; border-collapse: collapse; }
     .reveal table th { background: rgba(88,166,255,.12); color: var(--azul); font-weight: 600; }
-    .reveal table td, .reveal table th { padding: 0.4em 0.7em; border: 1px solid var(--border); }
+    .reveal table td, .reveal table th { padding: 0.35em 0.6em; border: 1px solid var(--border); }
     .reveal table tr:nth-child(even) td { background: rgba(255,255,255,.02); }
 
-    .portada-sub { font-size: 0.55em; color: var(--gris); margin-top: 0.5em; }
+    .portada-sub { font-size: 0.55em; color: var(--gris); margin-top: 0.4em; }
     .glow-azul  { text-shadow: 0 0 20px rgba(88,166,255,.6); }
     .glow-verde { text-shadow: 0 0 20px rgba(63,185,80,.6); }
   </style>
@@ -270,7 +284,7 @@ void sendHtml() {
 </section>
 
 <!-- A1-5: setup() WiFi + rutas -->
-<section class="dense">
+<section class="xdense">
   <div class="sec-header"><h2>A1 · Paso 4 — setup(): WiFi y rutas</h2></div>
   <pre style="margin-top:0.6em;"><code class="language-cpp" data-trim>
 void setup() {
@@ -319,31 +333,38 @@ void loop() {
   </div>
 </section>
 
-<!-- A1-7: Cómo probar -->
+<!-- A1-7a: Cómo probar — pasos -->
 <section>
   <div class="sec-header"><h2>A1 · Cómo probar en Wokwi</h2></div>
+  <div style="margin-top:1em;">
+    <div class="paso"><div class="paso-num">1</div><div><p>Abrir el proyecto en <strong>VS Code</strong> con la extensión <strong>Wokwi</strong> instalada</p></div></div>
+    <div class="paso"><div class="paso-num">2</div><div><p>Presionar <code>F1</code> → seleccionar <em>Wokwi: Start Simulation</em></p></div></div>
+    <div class="paso"><div class="paso-num">3</div><div><p>Esperar que el Serial Monitor muestre <code>¡Conectado!</code> y la dirección IP</p></div></div>
+    <div class="paso"><div class="paso-num verde">4</div><div><p>Abrir <code>http://localhost:8180</code> en el navegador</p></div></div>
+    <div class="paso"><div class="paso-num verde">5</div><div><p>Hacer clic en los botones ON/OFF — los LEDs cambian en el simulador</p></div></div>
+  </div>
+  <div class="card naranja" style="margin-top:1em;">
+    <p>Puerto <span class="hl-naranja">8180</span> configurado en <code>wokwi.toml</code> como túnel al puerto 80 del ESP32 simulado.</p>
+  </div>
+</section>
+
+<!-- A1-7b: Cómo probar — salida serial -->
+<section>
+  <div class="sec-header"><h2>A1 · Salida esperada en Serial Monitor</h2></div>
+  <div class="terminal" style="margin-top:1em; font-size:0.78em;">
+    <span class="dim"># Serial Monitor — Actividad 1</span><br>
+    Conectando a WiFi Wokwi-GUEST<span class="ok">................</span><br>
+    <span class="ok">¡Conectado!</span><br>
+    Dirección IP: <span class="ip">10.13.37.1</span><br>
+    <span class="ok">Servidor HTTP iniciado (http://localhost:8180)</span><br><br>
+    <span class="dim"># Al hacer clic en los botones:</span><br>
+    Cambiar LED #1<br>
+    Cambiar LED #2<br>
+    Cambiar LED #1
+  </div>
   <div class="cols2" style="margin-top:0.8em;">
-    <div>
-      <div class="paso"><div class="paso-num">1</div><div><p>Abrir proyecto en VS Code con extensión Wokwi instalada</p></div></div>
-      <div class="paso"><div class="paso-num">2</div><div><p><code>F1</code> → <em>Wokwi: Start Simulation</em></p></div></div>
-      <div class="paso"><div class="paso-num">3</div><div><p>Esperar <code>¡Conectado!</code> en el Serial Monitor</p></div></div>
-      <div class="paso"><div class="paso-num verde">4</div><div><p>Abrir <code>http://localhost:8180</code> en el navegador</p></div></div>
-      <div class="paso"><div class="paso-num verde">5</div><div><p>Clic en los botones — los LEDs cambian en el simulador</p></div></div>
-    </div>
-    <div>
-      <div class="terminal">
-        <span class="dim"># Serial Monitor esperado</span><br>
-        Conectando a WiFi Wokwi-GUEST<span class="ok">......</span><br>
-        <span class="ok">¡Conectado!</span><br>
-        IP: <span class="ip">10.13.37.1</span><br>
-        <span class="ok">Servidor HTTP iniciado</span><br>
-        Toggle LED 1<br>
-        Toggle LED 2
-      </div>
-      <div class="card naranja" style="margin-top:0.6em;">
-        <p>Puerto <span class="hl-naranja">8180</span> configurado en <code>wokwi.toml</code> como túnel al puerto 80 del ESP32 simulado.</p>
-      </div>
-    </div>
+    <div class="card azul"><p>Cada clic en el navegador genera un mensaje en el Serial → permite depurar sin pantalla.</p></div>
+    <div class="card verde"><p>Si no aparece la IP, revisar que la red sea <code>Wokwi-GUEST</code> y el canal <code>6</code>.</p></div>
   </div>
 </section>
 
@@ -375,53 +396,65 @@ void loop() {
   </p>
 </section>
 
-<!-- A2-2: ¿Cómo funciona un motor a pasos? -->
+<!-- A2-2a: Teoría Motor — conceptos -->
 <section>
   <div class="sec-header verde"><h2>A2 · Teoría — Motor a Pasos</h2></div>
-  <div class="cols2" style="margin-top:0.8em;">
-    <div>
-      <div class="card verde">
-        <h3>¿Qué es?</h3>
-        <p>Motor eléctrico que gira en <span class="hl-verde">incrementos discretos (pasos)</span>. Cada paso mueve el eje un ángulo fijo y preciso.</p>
-      </div>
-      <div class="card azul" style="margin-top:0.5em;">
-        <h3>NEMA 17</h3>
-        <p><span class="hl">200 pasos/vuelta</span> → 1.8° por paso<br>
-        4 bobinas (bipolar) → pines A+, A–, B+, B–</p>
-      </div>
-      <div class="card naranja" style="margin-top:0.5em;">
-        <h3>Full-step (4 fases)</h3>
-        <p>Se activan las bobinas en secuencia:<br>
-        <code>AB → A̅B → A̅B̅ → AB̅ → AB...</code></p>
-      </div>
+  <div class="cols3" style="margin-top:1em;">
+    <div class="card verde">
+      <h3>¿Qué es?</h3>
+      <p>Motor que gira en <span class="hl-verde">incrementos discretos</span>. Cada paso mueve el eje un ángulo fijo y repetible.</p>
     </div>
-    <div>
-      <table>
-        <thead>
-          <tr><th>Paso</th><th>A+</th><th>A–</th><th>B+</th><th>B–</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>1</td><td style="color:var(--verde);">▲</td><td></td><td style="color:var(--verde);">▲</td><td></td></tr>
-          <tr><td>2</td><td></td><td style="color:var(--rojo);">▼</td><td style="color:var(--verde);">▲</td><td></td></tr>
-          <tr><td>3</td><td></td><td style="color:var(--rojo);">▼</td><td></td><td style="color:var(--rojo);">▼</td></tr>
-          <tr><td>4</td><td style="color:var(--verde);">▲</td><td></td><td></td><td style="color:var(--rojo);">▼</td></tr>
-        </tbody>
-      </table>
-      <div class="card morado" style="margin-top:0.6em;">
-        <p><span class="hl-morado">RPM</span> = pasos/seg ÷ 200 × 60<br>
-        A 10 RPM → ~33 pasos/seg → 1 paso cada 30 ms</p>
-      </div>
+    <div class="card azul">
+      <h3>NEMA 17</h3>
+      <p><span class="hl">200 pasos/vuelta</span><br>→ 1.8° por paso<br>4 bobinas (bipolar)<br>pines A+, A–, B+, B–</p>
+    </div>
+    <div class="card naranja">
+      <h3>Full-step (4 fases)</h3>
+      <p>Bobinas se activan en secuencia para avanzar un paso a la vez:<br>
+      <code>AB → A̅B → A̅B̅ → AB̅</code></p>
+    </div>
+  </div>
+  <div class="card morado" style="margin-top:0.8em;">
+    <p>⚙️ A diferencia de un motor DC, el motor a pasos <span class="hl-morado">no necesita encoder</span> — la posición se controla contando pasos.</p>
+  </div>
+</section>
+
+<!-- A2-2b: Teoría Motor — secuencia y RPM -->
+<section>
+  <div class="sec-header verde"><h2>A2 · Teoría — Secuencia de bobinas y RPM</h2></div>
+  <table style="margin-top:0.8em;">
+    <thead>
+      <tr><th>Fase</th><th>A+</th><th>A–</th><th>B+</th><th>B–</th><th>Descripción</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>0</td><td style="color:var(--verde);">▲ HIGH</td><td></td><td></td><td style="color:var(--rojo);">▼ HIGH</td><td>A+ y B– activos</td></tr>
+      <tr><td>1</td><td style="color:var(--verde);">▲ HIGH</td><td></td><td style="color:var(--verde);">▲ HIGH</td><td></td><td>A+ y B+ activos</td></tr>
+      <tr><td>2</td><td></td><td style="color:var(--rojo);">▼ HIGH</td><td style="color:var(--verde);">▲ HIGH</td><td></td><td>A– y B+ activos</td></tr>
+      <tr><td>3</td><td></td><td style="color:var(--rojo);">▼ HIGH</td><td></td><td style="color:var(--rojo);">▼ HIGH</td><td>A– y B– activos</td></tr>
+    </tbody>
+  </table>
+  <div class="cols2" style="margin-top:0.8em;">
+    <div class="card morado">
+      <p><span class="hl-morado">Fórmula RPM:</span><br>
+      <code>delay (µs) = 60 000 000 ÷ (RPM × 200)</code><br>
+      A 10 RPM → 30 000 µs = 30 ms por paso</p>
+    </div>
+    <div class="card azul">
+      <p><span class="hl">CW</span>: recorrer fases 0→1→2→3→0<br>
+      <span class="hl">CCW</span>: recorrer fases 0→3→2→1→0<br>
+      La dirección es solo el orden de la secuencia.</p>
     </div>
   </div>
 </section>
 
-<!-- A2-3b: Instalación Stepper.h en PlatformIO -->
+<!-- A2-3b-1: Instalación — por qué y configuración -->
 <section>
-  <div class="sec-header verde"><h2>A2 · Instalar Stepper.h en PlatformIO</h2></div>
-  <div class="card rojo" style="margin-top:0.7em;">
-    <p>⚠️ <span class="hl-rojo"><code>Stepper.h</code> NO viene en el core ESP32</span> — solo existe en el core AVR (Arduino UNO/Mega). Hay que agregarla manualmente.</p>
+  <div class="sec-header verde"><h2>A2 · Instalar librería en PlatformIO — ¿Por qué?</h2></div>
+  <div class="card rojo" style="margin-top:0.9em;">
+    <p>⚠️ <span class="hl-rojo"><code>Stepper.h</code> NO viene en el core ESP32</span> — solo existe en el core AVR (Arduino UNO/Mega). Sin instalarla el compilador arroja:<br>
+    <code style="color:var(--rojo);">fatal error: Stepper.h: No such file or directory</code></p>
   </div>
-  <p style="margin:0.6em 0 0.3em; font-size:0.8em;">Editar <code>platformio.ini</code> y agregar la librería en <code>lib_deps</code>:</p>
+  <p style="margin:0.9em 0 0.4em;">Editar <code>platformio.ini</code> y agregar <code>lib_deps</code>:</p>
   <pre><code class="language-ini" data-trim>
 [env:esp32]
 platform  = espressif32
@@ -430,24 +463,28 @@ board     = esp32dev
 lib_deps  =
   arduino-libraries/Stepper@^1.1.3
   </code></pre>
-  <div class="cols2" style="margin-top:0.7em;">
-    <div class="card verde">
-      <div class="paso"><div class="paso-num verde">1</div><div><p>Agregar la línea <code>arduino-libraries/Stepper@^1.1.3</code> en <code>lib_deps</code></p></div></div>
-      <div class="paso"><div class="paso-num verde">2</div><div><p>Guardar <code>platformio.ini</code></p></div></div>
-      <div class="paso"><div class="paso-num verde">3</div><div><p>Ejecutar <code>pio run</code> — PlatformIO descarga la librería automáticamente</p></div></div>
-    </div>
-    <div>
-      <div class="terminal">
-        <span class="dim"># Terminal PlatformIO al compilar</span><br>
-        <span class="ok">Installing arduino-libraries/Stepper...</span><br>
-        <span class="ok">Stepper@1.1.3 installed!</span><br>
-        Compiling .pio/build/esp32/...<br>
-        <span class="ok">SUCCESS</span>
-      </div>
-      <div class="card azul" style="margin-top:0.5em;">
-        <p>El nombre exacto viene del registro: <span class="hl">registry.platformio.org</span><br>Buscar la librería → copiar el string de <code>lib_deps</code>.</p>
-      </div>
-    </div>
+  <div class="card azul" style="margin-top:0.8em;">
+    <p>El nombre exacto viene de <span class="hl">registry.platformio.org</span> — buscar la librería y copiar el string de <code>lib_deps</code>.</p>
+  </div>
+</section>
+
+<!-- A2-3b-2: Instalación — pasos y salida -->
+<section>
+  <div class="sec-header verde"><h2>A2 · Instalar librería en PlatformIO — Pasos</h2></div>
+  <div style="margin-top:0.9em;">
+    <div class="paso"><div class="paso-num verde">1</div><div><p>Agregar <code>arduino-libraries/Stepper@^1.1.3</code> en <code>lib_deps</code> del <code>platformio.ini</code></p></div></div>
+    <div class="paso"><div class="paso-num verde">2</div><div><p>Guardar el archivo <code>platformio.ini</code></p></div></div>
+    <div class="paso"><div class="paso-num verde">3</div><div><p>Ejecutar <code>pio run</code> — PlatformIO descarga e instala la librería automáticamente</p></div></div>
+  </div>
+  <div class="terminal" style="margin-top:0.9em; font-size:0.75em;">
+    <span class="dim"># Terminal de PlatformIO al compilar por primera vez</span><br>
+    <span class="ok">Installing arduino-libraries/Stepper @ ^1.1.3</span><br>
+    <span class="ok">Stepper @ 1.1.3 installed!</span><br>
+    Compiling .pio/build/esp32/src/esp32-leds-stepper.ino.cpp.o<br>
+    <span class="ok">SUCCESS — Took 12.4 seconds</span>
+  </div>
+  <div class="card naranja" style="margin-top:0.7em;">
+    <p>Las librerías se guardan en <code>.pio/libdeps/esp32/</code> — no se suben al repositorio (<code>.gitignore</code> las excluye).</p>
   </div>
 </section>
 
@@ -534,10 +571,10 @@ int pasosPorClick = 50;   // Pasos por clic de botón
   </div>
 </section>
 
-<!-- A2-6: Nuevas rutas HTTP -->
+<!-- A2-6a: Nuevas rutas HTTP — tabla -->
 <section class="dense">
   <div class="sec-header verde"><h2>A2 · Paso 2 — Nuevas rutas del servidor</h2></div>
-  <table style="margin-top:0.7em;">
+  <table style="margin-top:0.6em;">
     <thead><tr><th>Ruta HTTP</th><th>Acción</th></tr></thead>
     <tbody>
       <tr><td><code>GET /</code></td><td>Página principal (LEDs + Motor)</td></tr>
@@ -548,30 +585,50 @@ int pasosPorClick = 50;   // Pasos por clic de botón
       <tr><td><code>GET /stepper/steps/{n}</code></td><td>Cambiar pasos por clic (1–400)</td></tr>
     </tbody>
   </table>
-  <pre style="margin-top:0.6em;"><code class="language-cpp" data-trim>
+  <div class="cols2" style="margin-top:0.6em;">
+    <div class="card verde"><p>Las rutas de LEDs son <span class="hl-verde">idénticas a Actividad 1</span> — no se modifican.</p></div>
+    <div class="card azul"><p>Las 4 rutas del motor son <span class="hl">nuevas</span>: 2 de dirección + 2 de configuración.</p></div>
+  </div>
+</section>
+
+<!-- A2-6b: Nuevas rutas HTTP — código -->
+<section class="xdense">
+  <div class="sec-header verde"><h2>A2 · Paso 2 — Handlers del motor</h2></div>
+  <pre style="margin-top:0.5em;"><code class="language-cpp" data-trim>
+// Sentido horario: pasos positivos
 servidor.on("/stepper/cw", []() {
-  motor.step(pasosPorClick);   // positivo → horario
+  moverMotor(pasosPorClick);
   enviarHtml();
 });
 
+// Sentido antihorario: pasos negativos
 servidor.on("/stepper/ccw", []() {
-  motor.step(-pasosPorClick);  // negativo → antihorario
+  moverMotor(-pasosPorClick);
   enviarHtml();
 });
 
+// Cambiar velocidad (1-60 RPM)
 servidor.on(UriBraces("/stepper/speed/{}"), []() {
   int rpm = servidor.pathArg(0).toInt();
-  if (rpm >= 1 && rpm <= 60) {
-    velocidadRPM = rpm;
-    motor.setSpeed(velocidadRPM);
-  }
+  if (rpm >= 1 && rpm <= 60) { velocidadRPM = rpm; }
+  enviarHtml();
+});
+
+// Cambiar pasos por clic (1-400)
+servidor.on(UriBraces("/stepper/steps/{}"), []() {
+  int pasos = servidor.pathArg(0).toInt();
+  if (pasos >= 1 && pasos <= 400) { pasosPorClick = pasos; }
   enviarHtml();
 });
   </code></pre>
+  <div class="cols2" style="margin-top:0.4em;">
+    <div class="card naranja"><p><code>moverMotor(+n)</code> → dir=+1 → faseActual avanza → <span class="hl-naranja">CW</span></p></div>
+    <div class="card morado"><p><code>moverMotor(-n)</code> → dir=-1 → faseActual retrocede → <span class="hl-morado">CCW</span></p></div>
+  </div>
 </section>
 
 <!-- A2-7: HTML de la sección motor -->
-<section class="dense">
+<section class="xdense">
   <div class="sec-header verde"><h2>A2 · Paso 3 — HTML: sección motor</h2></div>
   <pre style="margin-top:0.6em;"><code class="language-html" data-trim>
 &lt;!-- Botones de dirección --&gt;
@@ -598,7 +655,7 @@ servidor.on(UriBraces("/stepper/speed/{}"), []() {
 </section>
 
 <!-- A2-8: Flujo completo Actividad 2 -->
-<section>
+<section class="dense">
   <div class="sec-header verde"><h2>A2 · Flujo completo</h2></div>
   <div style="margin-top:0.6em;">
     <div class="paso"><div class="paso-num verde">1</div><div><p>Usuario abre <code>http://localhost:8180</code> → ve LEDs + sección motor</p></div></div>
@@ -614,7 +671,7 @@ servidor.on(UriBraces("/stepper/speed/{}"), []() {
 </section>
 
 <!-- A2-9: Cómo probar Actividad 2 -->
-<section>
+<section class="dense">
   <div class="sec-header verde"><h2>A2 · Cómo probar en Wokwi</h2></div>
   <div class="cols2" style="margin-top:0.8em;">
     <div>
@@ -642,23 +699,65 @@ servidor.on(UriBraces("/stepper/speed/{}"), []() {
   </div>
 </section>
 
-<!-- A2-10: Diferencias A1 vs A2 + Ideas -->
+<!-- A2-10a: Comparativa A1 vs A2 -->
 <section>
-  <h2>Actividad 1 vs Actividad 2 — Resumen</h2>
-  <table style="margin:0.7em 0;">
+  <h2>Actividad 1 vs Actividad 2 — Comparativa</h2>
+  <table style="margin-top:0.8em;">
     <thead><tr><th></th><th>Actividad 1</th><th>Actividad 2</th></tr></thead>
     <tbody>
-      <tr><td>Actuadores</td><td>2 LEDs</td><td>2 LEDs + motor a pasos</td></tr>
-      <tr><td>Librerías extra</td><td>—</td><td><code>Stepper.h</code></td></tr>
-      <tr><td>Rutas HTTP</td><td>2 (<code>/</code>, <code>/toggle/{n}</code>)</td><td>6 rutas adicionales del motor</td></tr>
-      <tr><td>Estado global</td><td>2 <code>bool</code></td><td>+ <code>Stepper</code>, <code>int</code> velocidad y pasos</td></tr>
-      <tr><td>Bloqueo en loop</td><td>No</td><td>Sí — durante <code>motor.step()</code></td></tr>
+      <tr><td>Actuadores</td><td>2 LEDs</td><td>2 LEDs + motor a pasos NEMA 17</td></tr>
+      <tr><td>Librerías extra</td><td>—</td><td>Control manual (sin librería externa)</td></tr>
+      <tr><td>Rutas HTTP</td><td>2 rutas</td><td>6 rutas adicionales del motor</td></tr>
+      <tr><td>Estado global</td><td>2 <code>bool</code></td><td>+ array pines, secuencia, RPM, pasos</td></tr>
+      <tr><td>Funciones nuevas</td><td>—</td><td><code>darPaso()</code> y <code>moverMotor()</code></td></tr>
+      <tr><td>Bloqueo en loop</td><td>No</td><td>Sí — durante <code>moverMotor()</code></td></tr>
     </tbody>
   </table>
-  <div class="cols3" style="margin-top:0.7em;">
-    <div class="card verde"><p>💡 Agrega un sensor (ej. potenciómetro) y muestra su lectura en el HTML</p></div>
-    <div class="card azul"><p>📶 Combina con MQTT: publica cada movimiento del motor como evento IoT</p></div>
-    <div class="card morado"><p>⚡ Usa <code>AccelStepper</code> para movimiento no bloqueante y control de velocidad suave</p></div>
+  <div class="cols2" style="margin-top:0.7em;">
+    <div class="card azul"><p>Todo lo de Actividad 1 <span class="hl">se reutiliza sin cambios</span> — LEDs, WiFi, sendHtml, toggle.</p></div>
+    <div class="card verde"><p>Actividad 2 <span class="hl-verde">extiende</span> el servidor: nuevas rutas y nuevas funciones de motor.</p></div>
+  </div>
+</section>
+
+<!-- A2-10b: Ideas de extensión -->
+<section>
+  <h2>¿Qué sigue? — Ideas de extensión</h2>
+  <div class="cols3" style="margin-top:1.2em;">
+    <div class="card verde">
+      <h3>💡 Sensor analógico</h3>
+      <p>Agregar un potenciómetro en un GPIO ADC, leer con <code>analogRead()</code> y mostrar el valor en el HTML como barra de progreso.</p>
+    </div>
+    <div class="card azul">
+      <h3>📶 MQTT + Motor</h3>
+      <p>Publicar cada movimiento del motor como evento MQTT. Combinar el servidor web con un broker para monitoreo remoto.</p>
+    </div>
+    <div class="card morado">
+      <h3>⚡ AccelStepper</h3>
+      <p>Usar la librería <code>AccelStepper</code> para movimiento <strong>no bloqueante</strong> y aceleración/desaceleración suave.</p>
+    </div>
+  </div>
+</section>
+
+<!-- A2-10c: Proyecto final sugerido -->
+<section>
+  <h2>🚀 Proyecto final sugerido</h2>
+  <div class="card naranja" style="margin-top:1em;">
+    <h3>Sistema de posicionamiento web</h3>
+    <p>El usuario ingresa un ángulo en la página web y el motor gira exactamente esa cantidad de grados.</p>
+  </div>
+  <div class="cols3" style="margin-top:1em;">
+    <div class="card azul">
+      <h3>1 · Entrada</h3>
+      <p>Formulario HTML con campo numérico para el ángulo deseado (0°–360°).</p>
+    </div>
+    <div class="card verde">
+      <h3>2 · Cálculo</h3>
+      <p>Convertir grados a pasos:<br><code>pasos = ángulo ÷ 1.8</code><br>(200 pasos = 360°)</p>
+    </div>
+    <div class="card morado">
+      <h3>3 · Ejecución</h3>
+      <p>El ESP32 recibe el valor por URL, llama <code>moverMotor(pasos)</code> y responde con la posición actual.</p>
+    </div>
   </div>
 </section>
 
@@ -693,6 +792,11 @@ servidor.on(UriBraces("/stepper/speed/{}"), []() {
 <script>
   Reveal.initialize({
     hash: true,
+    width: 1100,
+    height: 700,
+    margin: 0.04,
+    minScale: 0.2,
+    maxScale: 2.0,
     slideNumber: 'c/t',
     transition: 'slide',
     backgroundTransition: 'fade',
